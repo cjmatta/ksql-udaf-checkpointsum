@@ -14,7 +14,7 @@ public class CheckpointSum {
   private static final String TYPE_ABSOLUTE = "absolute";
   private static final String TYPE_DELTA = "delta";
 
-  private static final Schema AGGREGATE_SRUCT = SchemaBuilder.struct().optional()
+  private static final Schema AGGREGATE_STRUCT = SchemaBuilder.struct().optional()
     .field(TYPE, Schema.OPTIONAL_STRING_SCHEMA)
     .field(VALUE, Schema.OPTIONAL_FLOAT32_SCHEMA)
     .build();
@@ -27,7 +27,7 @@ public class CheckpointSum {
     return new Udaf<Struct, Struct, Double>() {
       @Override
       public Struct initialize() {
-        return new Struct(AGGREGATE_SRUCT).put(TYPE, TYPE_ABSOLUTE).put(VALUE, 0L);
+        return new Struct(AGGREGATE_STRUCT).put(TYPE, TYPE_ABSOLUTE).put(VALUE, 0L);
       }
 
       @Override
@@ -38,15 +38,16 @@ public class CheckpointSum {
           return null;
         }
 
-        final String typeVal = obj.toString();
+        final String inputType = obj.toString();
 
-        if (!(typeVal.equals(TYPE_ABSOLUTE) || typeVal.equals(TYPE_DELTA))) {
+//        Return null if the value of TYPE isn't either TYPE_ABSOLUTE or TYPE_DELTA
+        if (!(inputType.equals(TYPE_ABSOLUTE) || inputType.equals(TYPE_DELTA))) {
           return null;
         }
-
-        if (typeVal.equals(TYPE_ABSOLUTE)) {
+//      If the input is an absolute value set the return to that value
+        if (inputType.equals(TYPE_ABSOLUTE)) {
           return aggregate.put(TYPE, TYPE_ABSOLUTE).put(VALUE, (double)input.get(VALUE));
-        } else {
+        } else { // otherwise sum the two values 
           return aggregate
             .put(TYPE, TYPE_DELTA)
             .put(VALUE, (double)aggregate.get(VALUE) + (double)input.get(VALUE));
@@ -55,7 +56,6 @@ public class CheckpointSum {
 
       @Override
       public Struct merge(Struct agg1, Struct agg2) {
-        final String agg1Type = agg1.get(TYPE).toString();
         final String agg2Type = agg2.get(TYPE).toString();
 
         if (agg2Type.equals(TYPE_ABSOLUTE)) {
