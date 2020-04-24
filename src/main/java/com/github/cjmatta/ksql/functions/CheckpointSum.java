@@ -41,7 +41,8 @@ public class CheckpointSum {
         String typeVal = obj.toString();
         System.out.println("typeValue = [" + typeVal + "]");
 
-        if (!(typeVal.equals(TYPE_ABSOLUTE) || typeVal.equals(TYPE_DELTA))) {
+//        Return null if the value of TYPE isn't either TYPE_ABSOLUTE or TYPE_DELTA
+        if (!(inputType.equals(TYPE_ABSOLUTE) || inputType.equals(TYPE_DELTA))) {
           return null;
         }
 
