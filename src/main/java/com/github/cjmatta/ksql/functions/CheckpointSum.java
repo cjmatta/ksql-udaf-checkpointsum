@@ -17,7 +17,7 @@ public class CheckpointSum {
 
   private static final Schema AGGREGATE_STRUCT = SchemaBuilder.struct().optional()
       .field(TYPE, Schema.STRING_SCHEMA)
-      .field(VALUE, Schema.FLOAT32_SCHEMA)
+      .field(VALUE, Schema.FLOAT64_SCHEMA)
       .build();
 
   @UdafFactory(description = "Compute the sum or a series of records representing either the absolute value or delta",
@@ -28,7 +28,7 @@ public class CheckpointSum {
 
       @Override
       public Struct initialize() {
-        return new Struct(AGGREGATE_STRUCT).put(TYPE, TYPE_ABSOLUTE).put(VALUE, 0.0f);
+        return new Struct(AGGREGATE_STRUCT).put(TYPE, TYPE_ABSOLUTE).put(VALUE, 0.0d);
       }
 
       @Override
@@ -45,14 +45,14 @@ public class CheckpointSum {
           return null;
         }
 
-        Float value = input.getFloat32(VALUE);
+        Double value = input.getFloat64(VALUE);
 
         if (typeVal.equals(TYPE_ABSOLUTE)) {
           return aggregate.put(TYPE, TYPE_ABSOLUTE).put(VALUE, value);
         } else {
           return aggregate
               .put(TYPE, TYPE_DELTA)
-              .put(VALUE, aggregate.getFloat32(VALUE) + value);
+              .put(VALUE, aggregate.getFloat64(VALUE) + value);
         }
       }
 
@@ -64,13 +64,13 @@ public class CheckpointSum {
           return agg2;
         } else {
           return agg2.put(TYPE, TYPE_DELTA)
-              .put(VALUE, agg1.getFloat32(VALUE) + agg2.getFloat32(VALUE));
+              .put(VALUE, agg1.getFloat64(VALUE) + agg2.getFloat64(VALUE));
         }
       }
 
       @Override
       public Float map(Struct agg) {
-        return agg.getFloat32(VALUE).floatValue();
+        return agg.getFloat64(VALUE).floatValue();
       }
     };
   }
