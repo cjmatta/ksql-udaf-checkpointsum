@@ -21,10 +21,10 @@ public class CheckpointSum {
       .build();
 
   @UdafFactory(description = "Compute the sum or a series of records representing either the absolute value or delta",
-      paramSchema = "STRUCT<TYPE STRING, VALUE DOUBLE>!")
-  public static Udaf<Struct, Struct, Float> checkpointSum() {
+      paramSchema = "STRUCT<TYPE VARCHAR, VALUE DOUBLE>")
+  public static Udaf<Struct, Struct, Double> checkpointSum() {
 
-    return new Udaf<Struct, Struct, Float>() {
+    return new Udaf<Struct, Struct, Double>() {
 
       @Override
       public Struct initialize() {
@@ -38,8 +38,8 @@ public class CheckpointSum {
           return null;
         }
 
-        String typeVal = obj.toString();
-        System.out.println("typeValue = [" + typeVal + "]");
+        String inputType = obj.toString();
+
 
 //        Return null if the value of TYPE isn't either TYPE_ABSOLUTE or TYPE_DELTA
         if (!(inputType.equals(TYPE_ABSOLUTE) || inputType.equals(TYPE_DELTA))) {
@@ -48,7 +48,7 @@ public class CheckpointSum {
 
         Double value = input.getFloat64(VALUE);
 
-        if (typeVal.equals(TYPE_ABSOLUTE)) {
+        if (inputType.equals(TYPE_ABSOLUTE)) {
           return aggregate.put(TYPE, TYPE_ABSOLUTE).put(VALUE, value);
         } else {
           return aggregate
@@ -70,8 +70,8 @@ public class CheckpointSum {
       }
 
       @Override
-      public Float map(Struct agg) {
-        return agg.getFloat64(VALUE).floatValue();
+      public Double map(Struct agg) {
+        return agg.getFloat64(VALUE);
       }
     };
   }

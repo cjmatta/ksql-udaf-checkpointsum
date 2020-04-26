@@ -18,7 +18,7 @@ public class CheckpointSumTest {
   @Test
   public void shouldAddDeltas() {
 
-    Udaf<Struct, Struct, Float> udaf = CheckpointSum.checkpointSum();
+    Udaf<Struct, Struct, Double> udaf = CheckpointSum.checkpointSum();
     Struct aggregate = udaf.initialize();
 
     Struct[] values = new Struct[] {
@@ -38,7 +38,7 @@ public class CheckpointSumTest {
   @Test
   public void shouldAddAbsolutes() {
 
-    Udaf<Struct, Struct, Float> udaf = CheckpointSum.checkpointSum();
+    Udaf<Struct, Struct, Double> udaf = CheckpointSum.checkpointSum();
     Struct aggregate = udaf.initialize();
 
     Struct[] values = new Struct[] {
@@ -59,7 +59,7 @@ public class CheckpointSumTest {
   @Test
   public void shouldTakeLatestAbsolute() {
 
-    Udaf<Struct, Struct, Float> udaf = CheckpointSum.checkpointSum();
+    Udaf<Struct, Struct, Double> udaf = CheckpointSum.checkpointSum();
     Struct aggregate = udaf.initialize();
 
     Struct[] values = new Struct[] {
