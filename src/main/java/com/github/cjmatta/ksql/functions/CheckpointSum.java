@@ -20,25 +20,20 @@ public class CheckpointSum {
       .build();
 
   @UdafFactory(description = "Compute the sum or a series of records representing either the absolute value or delta",
-      paramSchema = "STRUCT<TYPE STRING, VALUE DOUBLE>", aggregateSchema = "STRUCT<TYPE STRING, VALUE DOUBLE>")
-  public static Udaf<Struct, Struct, Double> checkpointSum() {
+      paramSchema = "STRUCT<TYPE VARCHAR, VALUE DOUBLE>")
+  public static Udaf<Struct, Double, Double> checkpointSum() {
 
-    return new Udaf<Struct, Struct, Double>() {
+    return new Udaf<Struct, Double, Double>() {
 
       @Override
-      public Struct initialize() {
-        return new Struct(AGGREGATE_STRUCT).put(TYPE, TYPE_ABSOLUTE).put(VALUE, 0.0d);
+      public Double initialize() {
+        return 0.0d;
       }
 
       @Override
-      public Struct aggregate(final Struct input, final Struct aggregate) {
+      public Double aggregate(final Struct input, final Double aggregate) {
         Object obj = input.get(TYPE);
-//        if (obj == null) {
-//          return null;
-//        }
-
         String inputType = obj.toString();
-
 
 //        Return null if the value of TYPE isn't either TYPE_ABSOLUTE or TYPE_DELTA
         if (!(inputType.equals(TYPE_ABSOLUTE) || inputType.equals(TYPE_DELTA))) {
@@ -48,29 +43,20 @@ public class CheckpointSum {
         Double value = input.getFloat64(VALUE);
 
         if (inputType.equals(TYPE_ABSOLUTE)) {
-          return aggregate.put(TYPE, TYPE_ABSOLUTE).put(VALUE, value);
+           return value;
         } else {
-          return aggregate
-              .put(TYPE, TYPE_DELTA)
-              .put(VALUE, aggregate.getFloat64(VALUE) + value);
+          return aggregate + value;
         }
       }
 
       @Override
-      public Struct merge(Struct agg1, Struct agg2) {
-        String agg2Type = agg2.get(TYPE).toString();
-
-        if (agg2Type.equals(TYPE_ABSOLUTE)) {
-          return agg2;
-        } else {
-          return agg2.put(TYPE, TYPE_DELTA)
-              .put(VALUE, agg1.getFloat64(VALUE) + agg2.getFloat64(VALUE));
-        }
+      public Double merge(Double aggOne, Double aggTwo) {
+        throw new RuntimeException("Session windows are unsupported with this UDAF");
       }
 
       @Override
-      public Double map(Struct agg) {
-        return agg.getFloat64(VALUE);
+      public Double map(Double agg) {
+        return agg;
       }
     };
   }

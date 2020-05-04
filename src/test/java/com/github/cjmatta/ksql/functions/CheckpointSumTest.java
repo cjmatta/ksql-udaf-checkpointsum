@@ -18,8 +18,8 @@ public class CheckpointSumTest {
   @Test
   public void shouldAddDeltas() {
 
-    Udaf<Struct, Struct, Double> udaf = CheckpointSum.checkpointSum();
-    Struct aggregate = udaf.initialize();
+    Udaf<Struct, Double, Double> udaf = CheckpointSum.checkpointSum();
+    Double aggregate = udaf.initialize();
 
     Struct[] values = new Struct[] {
       new Struct(INPUT_STRUCT).put(CheckpointSum.TYPE, CheckpointSum.TYPE_DELTA).put(CheckpointSum.VALUE, 1.0d),
@@ -31,15 +31,15 @@ public class CheckpointSumTest {
       aggregate = udaf.aggregate(thisValue, aggregate);
     }
 
-    assertEquals(3.0d, aggregate.getFloat64(CheckpointSum.VALUE), 0);
+    assertEquals(3.0d, aggregate, 0);
 
   }
 
   @Test
   public void shouldAddAbsolutes() {
 
-    Udaf<Struct, Struct, Double> udaf = CheckpointSum.checkpointSum();
-    Struct aggregate = udaf.initialize();
+    Udaf<Struct, Double, Double> udaf = CheckpointSum.checkpointSum();
+    Double aggregate = udaf.initialize();
 
     Struct[] values = new Struct[] {
       new Struct(INPUT_STRUCT).put(CheckpointSum.TYPE, CheckpointSum.TYPE_DELTA).put(CheckpointSum.VALUE, 1.0d),
@@ -53,14 +53,14 @@ public class CheckpointSumTest {
       aggregate = udaf.aggregate(thisValue, aggregate);
     }
 
-    assertEquals(12.0d, aggregate.getFloat64(CheckpointSum.VALUE), 0);
+    assertEquals(12.0d, aggregate, 0);
   }
 
   @Test
   public void shouldTakeLatestAbsolute() {
 
-    Udaf<Struct, Struct, Double> udaf = CheckpointSum.checkpointSum();
-    Struct aggregate = udaf.initialize();
+    Udaf<Struct, Double, Double> udaf = CheckpointSum.checkpointSum();
+    Double aggregate = udaf.initialize();
 
     Struct[] values = new Struct[] {
       new Struct(INPUT_STRUCT).put(CheckpointSum.TYPE, CheckpointSum.TYPE_ABSOLUTE).put(CheckpointSum.VALUE, 10.0d),
@@ -71,7 +71,7 @@ public class CheckpointSumTest {
       aggregate = udaf.aggregate(thisValue, aggregate);
     }
 
-    assertEquals(20.0d, aggregate.getFloat64(CheckpointSum.VALUE), 0);
+    assertEquals(20.0d, aggregate, 0);
   }
 
 }
