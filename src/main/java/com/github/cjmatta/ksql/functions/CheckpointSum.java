@@ -37,7 +37,7 @@ public class CheckpointSum {
 
 //        Return null if the value of TYPE isn't either TYPE_ABSOLUTE or TYPE_DELTA
         if (!(inputType.equals(TYPE_ABSOLUTE) || inputType.equals(TYPE_DELTA))) {
-          return null;
+          throw new RuntimeException("Input `type` must be either \"delta\" or \"absolute\"");
         }
 
         Double value = input.getFloat64(VALUE);
